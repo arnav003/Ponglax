@@ -4,41 +4,62 @@ using UnityEngine;
 
 public class BallControl : MonoBehaviour {
 
-	private Rigidbody2D rb2d;
-	private Vector2 vel;
+	private Rigidbody rb;
+	private Vector3 vel;
+	public float speed = 50.0f;
+	public ScoreManager scoreManager;
 
-	void GoBall() {
+	void AddForce() {
 		float rand = Random.Range (0, 2);
 		if (rand < 1) {
-			rb2d.AddForce (new Vector2 (20, -15));
+			var dir = new Vector3(1, 0, -1);
+            rb.AddForce (dir * speed);
 		} else {
-			rb2d.AddForce (new Vector2 (-20, -15));
+			var dir = new Vector3(-1, 0, -1);
+            rb.AddForce (dir * speed);
 		}
 	}
 
 	// Use this for initialization
 	void Start () {
-		rb2d = GetComponent<Rigidbody2D> ();
-		Invoke ("GoBall", 2);
+		rb = GetComponent<Rigidbody> ();
+		Invoke ("AddForce", 2);
 	}
 
 	void ResetBall() {
-		vel = new Vector2 (0, 0);
-		rb2d.velocity = vel;
-		transform.position = Vector2.zero;
-	}
+		rb.velocity = new Vector3(0, 0, 0);
+		transform.position = new Vector3(0, 0, 0);
+        Invoke("AddForce", 1);
+    }
 
-	void RestartGame() {
+	/*void RestartGame() {
 		ResetBall ();
 		Invoke ("GoBall", 1);
-	}
+	}*/
 
-	void OnCollisionEnter2D(Collision2D coll) {
-		if (coll.collider.CompareTag ("Player")) {
-			vel.x = rb2d.velocity.x;
-			vel.y = (rb2d.velocity.y / 2.0f) + (coll.collider.attachedRigidbody.velocity.y / 3.0f);
-			rb2d.velocity = vel;
+	void OnTriggerEnter(Collider coll) 
+	{
+		if (coll.CompareTag ("Racket")) 
+		{
+			float xFactor = 20.0f, zFactor = 10.0f;
+            float zVel = Mathf.Sign(rb.velocity.z) * (Mathf.Abs(rb.velocity.z) + Mathf.Abs(coll.gameObject.GetComponent<Rigidbody>().velocity.z) / zFactor);
+			float xVel = Mathf.Sign(rb.velocity.x) * (Mathf.Abs(rb.velocity.x) + Mathf.Abs(coll.gameObject.transform.position.x - transform.position.x) / xFactor);
+            rb.velocity = new Vector3(-xVel, rb.velocity.y, zVel);
 		}
-	}
+		if (coll.CompareTag("Wall"))
+		{
+			rb.velocity = new Vector3(rb.velocity.x, rb.velocity.y, -rb.velocity.z);
+		}
+		if (coll.CompareTag("Left Void"))
+		{
+			scoreManager.playerTwoScored();
+			ResetBall();
+		}
+        if (coll.CompareTag("Right Void"))
+        {
+			scoreManager.playerOneScored();
+			ResetBall();
+        }
+    }
 
 }

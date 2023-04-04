@@ -4,54 +4,67 @@ using UnityEngine;
 
 public class PlayerControls : MonoBehaviour {
 
-	public bool isMoveUpButtonPressed = false;
-	public bool isMoveDownButtonPressed = false;
 
-	public KeyCode moveUp;
-	public KeyCode moveDown;
+	public Camera mainCamera;
+	public Vector3 cameraOffset;
+	public bool isMoveLeftButtonPressed = false;
+	public bool isMoveRightButtonPressed = false;
+
+	public KeyCode moveLeft;
+	public KeyCode moveRight;
 	public float speed = 10.0f;
-	public float boundY = 2.25f;
-	private Rigidbody2D rb2d;
+	public float boundZ = 4.75f;
+	private Rigidbody rb;
 
 	// Use this for initialization
 	void Start () {
-		rb2d = GetComponent<Rigidbody2D> ();
+		rb = GetComponent<Rigidbody> ();
 	}
 
-	// Update is called once per frame
-	void Update () {
-		var vel = rb2d.velocity;
-		if (Input.GetKey (moveUp) || isMoveUpButtonPressed) {
-			vel.y = speed;
-		} else if (Input.GetKey (moveDown) || isMoveDownButtonPressed) {
-			vel.y = -speed;
+	void Update()
+	{		
+        var pos = transform.position;
+        if (pos.z > boundZ)
+        {
+            pos.z = boundZ;
+        }
+        else if (pos.z < -boundZ)
+        {
+            pos.z = -boundZ;
+        }
+        transform.position = pos;
+    }
+
+	void FixedUpdate () {
+		var vel = rb.velocity;
+		if (Input.GetKey (moveLeft) || isMoveLeftButtonPressed) {
+			vel.z = speed;
+		} else if (Input.GetKey (moveRight) || isMoveRightButtonPressed) {
+			vel.z = -speed;
 		} else if (!Input.anyKey) {
-			vel.y = 0;
+			vel.z = 0;
 		}
-		rb2d.velocity = vel;
-
-		var pos = transform.position;
-		if (pos.y > boundY) {
-			pos.y = boundY;
-		} else if (pos.y < -boundY) {
-			pos.y = -boundY;
-		}
-		transform.position = pos;
+		rb.velocity = vel;
 	}
 
-	public void ButtonUpPressed(){
-		isMoveUpButtonPressed = true;
+	private void LateUpdate()
+	{
+        mainCamera.transform.position = transform.position + cameraOffset;
+    }
+
+	public void ButtonLeftPressed(){
+		isMoveLeftButtonPressed = true;
 	}
 
-	public void ButtonUpReleased(){
-		isMoveUpButtonPressed = false;
+	public void ButtonLeftReleased(){
+		isMoveLeftButtonPressed = false;
 	}
 
-	public void ButtonDownPressed(){
-		isMoveDownButtonPressed = true;
+	public void ButtonRightPressed(){
+        isMoveRightButtonPressed = true;
 	}
 
-	public void ButtonDownReleased(){
-		isMoveDownButtonPressed = false;
+	public void ButtonRightReleased(){
+        isMoveRightButtonPressed = false;
 	}
 }
