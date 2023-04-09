@@ -12,10 +12,10 @@ public class BallControl : MonoBehaviour {
 	void AddForce() {
 		float rand = Random.Range (0, 2);
 		if (rand < 1) {
-			var dir = new Vector3(1, 0, -1);
+			var dir = new Vector3(Random.Range(0.5f, 1), 0, Random.Range(-1, -0.5f));
             rb.AddForce (dir * speed);
 		} else {
-			var dir = new Vector3(-1, 0, -1);
+            var dir = new Vector3(Random.Range(-1, -0.5f), 0, Random.Range(-1, -0.5f));
             rb.AddForce (dir * speed);
 		}
 	}
@@ -26,7 +26,7 @@ public class BallControl : MonoBehaviour {
 		Invoke ("AddForce", 2);
 	}
 
-	void ResetBall() {
+	public void ResetBall() {
 		rb.velocity = new Vector3(0, 0, 0);
 		transform.position = new Vector3(0, 0, 0);
         Invoke("AddForce", 1);

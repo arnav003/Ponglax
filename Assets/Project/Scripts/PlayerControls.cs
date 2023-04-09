@@ -4,9 +4,14 @@ using UnityEngine;
 
 public class PlayerControls : MonoBehaviour {
 
+	public bool isAI = false;
+    public float aiOffset = 0.2f;
 
 	public Camera mainCamera;
 	public Vector3 cameraOffset;
+
+	public BallControl ballControl;
+
 	public bool isMoveLeftButtonPressed = false;
 	public bool isMoveRightButtonPressed = false;
 
@@ -36,18 +41,54 @@ public class PlayerControls : MonoBehaviour {
     }
 
 	void FixedUpdate () {
-		var vel = rb.velocity;
-		if (Input.GetKey (moveLeft) || isMoveLeftButtonPressed) {
-			vel.z = speed;
-		} else if (Input.GetKey (moveRight) || isMoveRightButtonPressed) {
-			vel.z = -speed;
-		} else if (!Input.anyKey) {
-			vel.z = 0;
-		}
-		rb.velocity = vel;
+        if (isAI)
+        {
+            AI();
+        }
+        else 
+        {
+            Human();
+        }
 	}
 
-	private void LateUpdate()
+	private void Human()
+	{
+        var vel = rb.velocity;
+        if (Input.GetKey(moveLeft) || isMoveLeftButtonPressed)
+        {
+            vel.z = speed;
+        }
+        else if (Input.GetKey(moveRight) || isMoveRightButtonPressed)
+        {
+            vel.z = -speed;
+        }
+        else if (!Input.anyKey)
+        {
+            vel.z = 0;
+        }
+        rb.velocity = vel;
+    }
+
+    private void AI()
+    {
+        var vel = rb.velocity;
+        if (ballControl.gameObject.transform.position.z > transform.position.z + aiOffset)
+        {
+            vel.z = speed;
+        }
+        else if (ballControl.gameObject.transform.position.z < transform.position.z - aiOffset)
+        {
+            vel.z = -speed;
+        }
+        else
+        {
+            vel.z = 0;
+        }
+        rb.velocity = vel;
+    }
+
+
+    private void LateUpdate()
 	{
         mainCamera.transform.position = transform.position + cameraOffset;
     }

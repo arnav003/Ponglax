@@ -28,6 +28,13 @@ public class ScoreManager : MonoBehaviour
         changeScore();
     }
 
+    public void resetScore()
+    {
+        playerOne = 0;
+        playerTwo = 0;
+        changeScore();
+    }
+
     void changeScore()
     {
         scoreText.text = playerOne.ToString() + " : " + playerTwo.ToString();
